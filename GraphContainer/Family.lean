@@ -156,26 +156,20 @@ theorem fingerprint_certificate {β : ℝ} {R q : ℕ}
   have hfp_indep :
       G.IsIndepSet (fingerprint G q I) :=
     fingerprint_isIndepSet G hI q
-
   rw [remainder, if_pos hfp_indep]
-
   have hrun :
       run G (fingerprint G q I) q = run G I q :=
     run_fingerprint_eq_run G hI hqI
-
   refine
     { fingerprint_subset := fingerprint_subset G I q
       fingerprint_card := card_fingerprint_of_le_card G hI hqI
       remainder_card := ?_
       residual_subset := ?_ }
-
   · change #(run G (fingerprint G q I) q).active ≤ R
     rw [hrun]
     exact card_activeAfter_le G h hI hqI
-
   · change I \ fingerprint G q I ⊆
       (run G (fingerprint G q I) q).active
     rw [hrun]
     exact sdiff_fingerprint_subset_activeAfter G hI q
-
 end SimpleGraph.Container
