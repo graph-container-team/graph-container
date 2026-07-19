@@ -1,5 +1,8 @@
 # Implementation plan
 
+This file records the original Theorem 2.1 work packages. The separate plan for the Theorem 2.3
+application is in `THEOREM_2_3_IMPLEMENTATION.md`.
+
 ## 1. Formal target
 
 Let `G : SimpleGraph V` with `V` finite, let `R q : ℕ`, and let `β : ℝ`. Assume:
