@@ -89,13 +89,12 @@ theorem isIntersecting_iff_isIndepSet (hk : 0 < k) (𝒜 : Finset (Vertex n k)) 
     apply h
     · exact ⟨A, hA, rfl⟩
     · exact ⟨B, hB, rfl⟩
-    · exact (graph_adj_iff_disjoint hk).mp hadj
+    · exact (graph_adj_iff_disjoint n k hk).mp hadj
   · intro h
     rintro A ⟨A', hA', rfl⟩ B ⟨B', hB', rfl⟩ hdisjoint
     have hadj : (graph n k).Adj A' B' :=
-      (graph_adj_iff_disjoint hk).mpr hdisjoint
-    exact (h hA' hB' (graph_adj_iff.mp hadj).1) hadj
-
+      (graph_adj_iff_disjoint n k hk).mpr hdisjoint
+    exact (h hA' hB' ((graph_adj_iff n k).mp hadj).1) hadj
 
 /-- The finite collection of all intersecting `k`-uniform families on `Fin n`. -/
 noncomputable def intersectingFamilies (n k : ℕ) : Finset (Finset (Vertex n k)) := by
@@ -154,19 +153,19 @@ theorem pow_starSize_le_intersectingFamilyCount
     2 ^ starSize n k ≤ intersectingFamilyCount n k := by
   classical
   let i : Fin n := ⟨0, hn⟩
-  have hsubset : (star i k).powerset ⊆ intersectingFamilies n k := by
+  have hsubset : (star n i k).powerset ⊆ intersectingFamilies n k := by
     intro 𝒜 h𝒜
     rw [mem_intersectingFamilies, IsIntersecting, underlyingFamily]
     rintro A ⟨A', hA', rfl⟩ B ⟨B', hB', rfl⟩
-    have h𝒜star : 𝒜 ⊆ star i k := Finset.mem_powerset.mp h𝒜
+    have h𝒜star : 𝒜 ⊆ star n i k := Finset.mem_powerset.mp h𝒜
     have hiA : i ∈ (A' : Finset (Fin n)) :=
       (Finset.mem_filter.mp (h𝒜star hA')).2
     have hiB : i ∈ (B' : Finset (Fin n)) :=
       (Finset.mem_filter.mp (h𝒜star hB')).2
     exact Finset.not_disjoint_iff.mpr ⟨i, hiA, hiB⟩
   calc
-    2 ^ starSize n k = #((star i k).powerset) := by
-      rw [Finset.card_powerset, card_star i hk]
+    2 ^ starSize n k = #((star n i k).powerset) := by
+      rw [Finset.card_powerset, card_star n i hk]
     _ ≤ #(intersectingFamilies n k) := Finset.card_le_card hsubset
     _ = intersectingFamilyCount n k := rfl
 
