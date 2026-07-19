@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Graph Container formalization team
 -/
 module
+public import GraphContainer.Basic
 public import Mathlib.Analysis.SpecialFunctions.Exp
 public import Mathlib.Combinatorics.SimpleGraph.Clique
 public import Mathlib.Combinatorics.SimpleGraph.DegreeSum
