@@ -6,9 +6,11 @@ Authors: Graph Container formalization team
 module
 
 public import GraphContainer.Counting
+public import GraphContainer.Intersecting.Theorem
 
 /-!
 # Graph container theorem
 
-This is the umbrella import for the compile-ready formalization framework for Theorem 2.1.
+This is the umbrella import for the compile-ready formalization frameworks for Theorems 2.1 and
+2.3.
 -/
