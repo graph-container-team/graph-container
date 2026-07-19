@@ -5,7 +5,7 @@ Authors: Graph Container formalization team
 -/
 module
 
-public import GraphContainer.IntersectingCounting.Basic
+public import GraphContainer.Intersecting.Basic
 public import Mathlib.Combinatorics.SimpleGraph.AdjMatrix
 public import Mathlib.Combinatorics.SimpleGraph.DegreeSum
 public import Mathlib.Data.Real.Basic

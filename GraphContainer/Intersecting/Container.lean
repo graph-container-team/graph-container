@@ -5,8 +5,8 @@ Authors: Graph Container formalization team
 -/
 module
 
-public import Family
-public import GraphContainer.IntersectingCounting.Supersaturation
+public import GraphContainer.Family
+public import GraphContainer.Intersecting.Supersaturation
 public import Mathlib.Algebra.Order.Floor.Ring
 public import Mathlib.Analysis.SpecialFunctions.Log.Basic
 

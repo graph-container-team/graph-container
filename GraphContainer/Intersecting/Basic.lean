@@ -23,35 +23,35 @@ open Finset
 
 namespace SimpleGraph.KneserCounting
 
-variable {n k : ℕ}
+variable (n k : ℕ)
 
 /-- The type of `k`-subsets of `Fin n`. -/
-abbrev Vertex (n k : ℕ) := Set.powersetCard (Fin n) k
+abbrev Vertex := Set.powersetCard (Fin n) k
 
 /-- The number of vertices of the Kneser graph. -/
-def vertexCount (n k : ℕ) : ℕ := n.choose k
+def vertexCount : ℕ := n.choose k
 
 /-- The size of a full star. -/
-def starSize (n k : ℕ) : ℕ := (n - 1).choose (k - 1)
+def starSize : ℕ := (n - 1).choose (k - 1)
 
 /-- The degree of the Kneser graph. -/
-def regularDegree (n k : ℕ) : ℕ := (n - k).choose k
+def regularDegree : ℕ := (n - k).choose k
 
 /-- The range in which the asymptotic counting theorem is stated. -/
-def InRange (n k : ℕ) : Prop := 3 ≤ k ∧ 2 * k + 1 ≤ n
+def InRange : Prop := 3 ≤ k ∧ 2 * k + 1 ≤ n
 
 /-- There are `n.choose k` vertices. -/
-theorem card_vertex (n k : ℕ) : Fintype.card (Vertex n k) = vertexCount n k := by
+theorem card_vertex : Fintype.card (Vertex n k) = vertexCount n k := by
   rw [Fintype.card_eq_nat_card, Set.powersetCard.card, Nat.card_fin]
   rfl
 
 /-- The Kneser graph on the `k`-subsets of `Fin n`. -/
-def graph (n k : ℕ) : SimpleGraph (Vertex n k) where
+def graph : SimpleGraph (Vertex n k) where
   Adj A B := A ≠ B ∧ Disjoint (A : Finset (Fin n)) (B : Finset (Fin n))
   symm.symm _ _ h := ⟨h.1.symm, h.2.symm⟩
   loopless.irrefl _ h := h.1 rfl
 
-instance graph.instDecidableRelAdj (n k : ℕ) : DecidableRel (graph n k).Adj :=
+instance graph.instDecidableRelAdj : DecidableRel (graph n k).Adj :=
   inferInstanceAs (DecidableRel fun A B : Vertex n k ↦
     A ≠ B ∧ Disjoint (A : Finset (Fin n)) (B : Finset (Fin n)))
 
@@ -78,11 +78,11 @@ def underlyingFamily (𝒜 : Finset (Vertex n k)) : Set (Finset (Fin n)) :=
 
 /-- The canonical mathlib predicate for an intersecting uniform family. -/
 def IsIntersecting (𝒜 : Finset (Vertex n k)) : Prop :=
-  (underlyingFamily 𝒜).Intersecting
+  (underlyingFamily n k 𝒜).Intersecting
 
 /-- Intersecting families are precisely independent sets in the Kneser graph. -/
 theorem isIntersecting_iff_isIndepSet (hk : 0 < k) (𝒜 : Finset (Vertex n k)) :
-    IsIntersecting 𝒜 ↔ (graph n k).IsIndepSet 𝒜 := by
+    IsIntersecting n k 𝒜 ↔ (graph n k).IsIndepSet 𝒜 := by
   rw [SimpleGraph.isIndepSet_iff]
   constructor
   · intro h A hA B hB _hAB hadj
@@ -96,13 +96,14 @@ theorem isIntersecting_iff_isIndepSet (hk : 0 < k) (𝒜 : Finset (Vertex n k)) 
       (graph_adj_iff_disjoint hk).mpr hdisjoint
     exact (h hA' hB' (graph_adj_iff.mp hadj).1) hadj
 
+
 /-- The finite collection of all intersecting `k`-uniform families on `Fin n`. -/
 noncomputable def intersectingFamilies (n k : ℕ) : Finset (Finset (Vertex n k)) := by
   classical
-  exact Finset.univ.filter IsIntersecting
+  exact Finset.univ.filter (IsIntersecting n k)
 
 @[simp] theorem mem_intersectingFamilies {𝒜 : Finset (Vertex n k)} :
-    𝒜 ∈ intersectingFamilies n k ↔ IsIntersecting 𝒜 := by
+    𝒜 ∈ intersectingFamilies n k ↔ IsIntersecting n k 𝒜 := by
   classical
   simp [intersectingFamilies]
 
@@ -124,17 +125,17 @@ def star (i : Fin n) (k : ℕ) : Finset (Vertex n k) :=
 
 /-- A full star has size `choose (n - 1) (k - 1)`. -/
 theorem card_star (i : Fin n) {k : ℕ} (hk : 0 < k) :
-    #(star i k) = starSize n k := by
+    #(star n i k) = starSize n k := by
   classical
   let valEmbedding : Vertex n k ↪ Finset (Fin n) :=
     ⟨fun A ↦ (A : Finset (Fin n)), fun _ _ h ↦ Subtype.ext h⟩
   have hmap :
-      (star i k).map valEmbedding =
+      (star n i k).map valEmbedding =
         ((Finset.univ : Finset (Fin n)).powersetCard k).filter (i ∈ ·) := by
     ext A
     simp [star, valEmbedding, Finset.mem_powersetCard, and_comm]
   calc
-    #(star i k) = #((star i k).map valEmbedding) := (Finset.card_map _).symm
+    #(star n i k) = #((star n i k).map valEmbedding) := (Finset.card_map _).symm
     _ = #(((Finset.univ : Finset (Fin n)).powersetCard k).filter (i ∈ ·)) := by
       rw [hmap]
     _ = #(((Finset.univ : Finset (Fin n)).powersetCard k).filter ({i} ⊆ ·)) := by
@@ -145,6 +146,7 @@ theorem card_star (i : Fin n) {k : ℕ} (hk : 0 < k) :
       Finset.card_filter_powersetCard_subset {i} Finset.univ k
         (Finset.subset_univ _) (by rw [Finset.card_singleton]; exact hk)
     _ = starSize n k := by simp [starSize]
+
 
 /-- Subfamilies of a full star give the elementary lower bound. -/
 theorem pow_starSize_le_intersectingFamilyCount
