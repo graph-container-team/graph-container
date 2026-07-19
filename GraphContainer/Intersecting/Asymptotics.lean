@@ -5,14 +5,14 @@ Authors: Graph Container formalization team
 -/
 module
 
-public import GraphContainer.Intersecting.Parameters
+public import GraphContainer.IntersectingCounting.Container
+public import Mathlib.Analysis.SpecialFunctions.Log.Base
 
 /-!
-# Uniform asymptotic estimates for Theorem 2.3
+# Uniform asymptotic count of intersecting families
 
-The notation `o(1)` in the PDF is made precise uniformly over every sequence `k = k(n)` that is
-eventually in the range `3 ≤ k` and `2 * k + 1 ≤ n`. It combines the separate parameter
-estimates into the lower and upper bounds used by the final squeeze argument.
+This file keeps the analytic bookkeeping next to the final squeeze argument.  The principal theorem
+uses an explicit epsilon formulation of uniformity; sequence and fixed-`k` versions are corollaries.
 -/
 
 @[expose] public section
@@ -20,53 +20,76 @@ estimates into the lower and upper bounds used by the final squeeze argument.
 open Filter
 open scoped Topology
 
-namespace SimpleGraph.Kneser
+namespace SimpleGraph.KneserCounting
 
-/-- The logarithmic normalization that precisely represents the exponent in Theorem 2.3. -/
-noncomputable def normalizedLogCount (n k : ℕ) : ℝ :=
-  Real.log (intersectingFamilyCount n k : ℝ) /
-    ((starSize n k : ℝ) * Real.log 2)
+/-- The auxiliary error parameter used in the container construction. -/
+private noncomputable def asymptoticEpsilon (n : ℕ) : ℝ :=
+  (Real.sqrt (n : ℝ))⁻¹
 
-/-- The relative excess in the exponent of the finite container upper bound. -/
-noncomputable def containerOverhead (n k : ℕ) : ℝ :=
-  let ε := asymptoticEpsilon n
-  let R := containerThreshold ε n k
-  let q := fingerprintSize ε n k
-  ((R : ℝ) - (starSize n k : ℝ) + (q : ℝ) +
-      Real.logb 2 ((vertexCount n k).choose q : ℝ)) /
-    (starSize n k : ℝ)
+/-- The base-two logarithm of the count, normalized by the full-star size. -/
+noncomputable def logRatio (n k : ℕ) : ℝ :=
+  Real.logb 2 (intersectingFamilyCount n k : ℝ) / (starSize n k : ℝ)
 
-/-- Choosing a fingerprint contributes only a lower-order logarithmic factor. -/
-theorem fingerprintChoiceLog_isLittleO
-    (k : ℕ → ℕ)
-    (hk : ∀ᶠ n in atTop, 3 ≤ k n ∧ 2 * k n + 1 ≤ n) :
-    (fun n ↦
+private theorem eventually_fingerprint_le_vertexCount :
+    ∀ᶠ n in atTop, ∀ k, InRange n k →
+      fingerprintSize (asymptoticEpsilon n) n k ≤ vertexCount n k := by
+  sorry
+
+/-- Rounding the container threshold contributes uniformly lower-order error. -/
+private theorem eventually_threshold_overhead_le
+    {δ : ℝ} (hδ : 0 < δ) :
+    ∀ᶠ n in atTop, ∀ k, InRange n k →
+      (containerThreshold (asymptoticEpsilon n) n k : ℝ) - (starSize n k : ℝ) ≤
+        δ * (starSize n k : ℝ) := by
+  sorry
+
+/-- Fingerprints have uniformly lower-order size. -/
+private theorem eventually_fingerprint_overhead_le
+    {δ : ℝ} (hδ : 0 < δ) :
+    ∀ᶠ n in atTop, ∀ k, InRange n k →
+      (fingerprintSize (asymptoticEpsilon n) n k : ℝ) ≤ δ * (starSize n k : ℝ) := by
+  sorry
+
+/-- Choosing a fingerprint contributes a uniformly lower-order logarithmic factor. -/
+private theorem eventually_fingerprintChoice_overhead_le
+    {δ : ℝ} (hδ : 0 < δ) :
+    ∀ᶠ n in atTop, ∀ k, InRange n k →
       Real.logb 2
-        ((vertexCount n (k n)).choose
-          (fingerprintSize (asymptoticEpsilon n) n (k n)) : ℝ)) =o[atTop]
-      (fun n ↦ (starSize n (k n) : ℝ)) := by
+          ((vertexCount n k).choose
+            (fingerprintSize (asymptoticEpsilon n) n k) : ℝ) ≤
+        δ * (starSize n k : ℝ) := by
   sorry
 
-/-- The entire relative overhead in the container bound tends to zero. -/
-theorem containerOverhead_tendsto_zero
-    (k : ℕ → ℕ)
-    (hk : ∀ᶠ n in atTop, 3 ≤ k n ∧ 2 * k n + 1 ≤ n) :
-    Tendsto (fun n ↦ containerOverhead n (k n)) atTop (𝓝 0) := by
+/-- **Theorem 2.3 (uniform form).**
+
+The normalized logarithm tends to one uniformly for `3 ≤ k` and `2 * k + 1 ≤ n`.
+-/
+theorem intersectingFamilyCount_logRatio_tendstoUniformly :
+    ∀ δ > 0, ∀ᶠ n in atTop, ∀ k, InRange n k → |logRatio n k - 1| < δ := by
+  intro δ hδ
+  have hR := eventually_threshold_overhead_le hδ
+  have hq := eventually_fingerprint_overhead_le hδ
+  have hchoice := eventually_fingerprintChoice_overhead_le hδ
+  have hvalid := eventually_fingerprint_le_vertexCount
+  -- Use `pow_starSize_le_intersectingFamilyCount` for the lower bound and
+  -- `intersectingFamilyCount_le` for the upper bound, then squeeze.
   sorry
 
-/-- The star construction gives the eventual lower half of the logarithmic squeeze. -/
-theorem eventually_one_le_normalizedLogCount
-    (k : ℕ → ℕ)
-    (hk : ∀ᶠ n in atTop, 3 ≤ k n ∧ 2 * k n + 1 ≤ n) :
-    ∀ᶠ n in atTop, 1 ≤ normalizedLogCount n (k n) := by
-  sorry
+/-- Sequence formulation of the uniform asymptotic theorem. -/
+theorem intersectingFamilyCount_logRatio_tendsto_one
+    (k : ℕ → ℕ) (hk : ∀ᶠ n in atTop, InRange n (k n)) :
+    Tendsto (fun n ↦ logRatio n (k n)) atTop (𝓝 1) := by
+  rw [Metric.tendsto_nhds]
+  intro δ hδ
+  filter_upwards [intersectingFamilyCount_logRatio_tendstoUniformly δ hδ, hk] with n hU hn
+  simpa [Real.dist_eq] using hU (k n) hn
 
-/-- The finite container estimate gives the eventual upper half of the logarithmic squeeze. -/
-theorem eventually_normalizedLogCount_le
-    (k : ℕ → ℕ)
-    (hk : ∀ᶠ n in atTop, 3 ≤ k n ∧ 2 * k n + 1 ≤ n) :
-    ∀ᶠ n in atTop,
-      normalizedLogCount n (k n) ≤ 1 + containerOverhead n (k n) := by
-  sorry
+/-- Fixed-`k` formulation, obtained as a special case of the sequence theorem. -/
+theorem intersectingFamilyCount_logRatio_tendsto_one_fixed
+    {k : ℕ} (hk : 3 ≤ k) :
+    Tendsto (fun n ↦ logRatio n k) atTop (𝓝 1) := by
+  apply intersectingFamilyCount_logRatio_tendsto_one (fun _ ↦ k)
+  filter_upwards [eventually_ge_atTop (2 * k + 1)] with n hn
+  exact ⟨hk, hn⟩
 
-end SimpleGraph.Kneser
+end SimpleGraph.KneserCounting
