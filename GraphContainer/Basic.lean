@@ -80,11 +80,16 @@ def fingerprints (q : ℕ) : Finset (Finset V) :=
 omit [DecidableEq V] in
 @[simp] theorem mem_fingerprints {q : ℕ} {S : Finset V} :
     S ∈ fingerprints (V := V) q ↔ #S = q := by
-  sorry
+      rw [fingerprints, mem_powersetCard]
+      constructor
+      · intro h
+        exact h.2
+      · intro h
+        exact ⟨subset_univ S, h⟩
 
 omit [DecidableEq V] in
 @[simp] theorem card_fingerprints (q : ℕ) :
     #(fingerprints (V := V) q) = (Fintype.card V).choose q := by
-  sorry
+      rw [fingerprints, card_powersetCard, card_univ]
 
 end SimpleGraph.Container
