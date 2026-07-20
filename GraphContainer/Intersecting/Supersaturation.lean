@@ -231,7 +231,7 @@ theorem isRegularOfDegree_graph (n : ℕ) {k : ℕ} (hk : 0 < k) :
     _ = regularDegree n k := rfl
 
 /-- The local-density coefficient in Proposition 2.7. -/
-noncomputable def supersaturationDensity (ε : ℝ) (n k : ℕ) : ℝ :=
+noncomputable def densityParameter (ε : ℝ) (n k : ℕ) : ℝ :=
   (ε / (1 + ε)) *
     ((regularDegree n k : ℝ) * (n : ℝ) /
       ((vertexCount n k : ℝ) * ((n - k : ℕ) : ℝ)))
@@ -248,7 +248,7 @@ theorem kneser_supersaturation_of_isLeast
       (-((k : ℝ) / (((n - k : ℕ) : ℝ)) * (regularDegree n k : ℝ))))
     (S : Finset (Vertex n k))
     (hS : (1 + ε) * (starSize n k : ℝ) ≤ (S.card : ℝ)) :
-    supersaturationDensity ε n k * (S.card.choose 2 : ℝ) ≤
+    densityParameter ε n k * (S.card.choose 2 : ℝ) ≤
       (#((graph n k).induce (S : Set (Vertex n k))).edgeFinset : ℝ) := by
   classical
   let N : ℝ := vertexCount n k
@@ -294,22 +294,22 @@ theorem kneser_supersaturation_of_isLeast
       dsimp [s]
       exact_mod_cast Nat.sub_le S.card 1
     nlinarith [mul_le_mul_of_nonneg_left hsub hs]
-  have hdensity : 0 ≤ supersaturationDensity ε n k := by
-    rw [supersaturationDensity]
+  have hdensity : 0 ≤ densityParameter ε n k := by
+    rw [densityParameter]
     positivity
   calc
-    supersaturationDensity ε n k * (S.card.choose 2 : ℝ) ≤
-        supersaturationDensity ε n k * (s ^ 2 / 2) :=
+    densityParameter ε n k * (S.card.choose 2 : ℝ) ≤
+        densityParameter ε n k * (s ^ 2 / 2) :=
       mul_le_mul_of_nonneg_left hchoose hdensity
     _ ≤ D / (2 * N) * s ^ 2 +
         (-((k : ℝ) / d * D)) / (2 * N) * s * (N - s) := by
       have hid :
           (D / (2 * N) * s ^ 2 +
               (-((k : ℝ) / d * D)) / (2 * N) * s * (N - s)) -
-              supersaturationDensity ε n k * (s ^ 2 / 2) =
+              densityParameter ε n k * (s ^ 2 / 2) =
             D * s * (n : ℝ) / (2 * N * d * (1 + ε)) *
               (s - (1 + ε) * M) := by
-        rw [supersaturationDensity]
+        rw [densityParameter]
         dsimp [D, N, M, d]
         field_simp
         dsimp [N, M] at hstar
@@ -324,5 +324,26 @@ theorem kneser_supersaturation_of_isLeast
         exact sub_nonneg.mpr hS
       nlinarith [mul_nonneg hfactor hthreshold]
     _ ≤ (#((graph n k).induce (S : Set (Vertex n k))).edgeFinset : ℝ) := hmixed
+
+/-- **Proposition 2.7.**
+Every sufficiently large vertex set in the Kneser graph spans
+a positive proportion of all possible edges.
+-/
+theorem kneser_supersaturation
+    {ε : ℝ} {n k : ℕ}
+    (hε : 0 < ε)
+    (hk : 0 < k)
+    (hnk : 2 * k + 1 ≤ n)
+    (S : Finset (Vertex n k))
+    (hS :
+      (1 + ε) * (starSize n k : ℝ) ≤ (S.card : ℝ)) :
+    densityParameter ε n k * (S.card.choose 2 : ℝ) ≤
+      (#((graph n k).induce
+        (S : Set (Vertex n k))).edgeFinset : ℝ) := by
+  exact kneser_supersaturation_of_isLeast
+    hε hk hnk
+    (kneser_least_eigenvalue
+      (n := n) (k := k) hk hnk)
+    S hS
 
 end SimpleGraph.KneserCounting

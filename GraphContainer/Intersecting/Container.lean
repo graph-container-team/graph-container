@@ -36,12 +36,19 @@ noncomputable def fingerprintSize (ε : ℝ) (n k : ℕ) : ℕ :=
 theorem. -/
 theorem kneser_isLocallyDense
     {ε : ℝ} {n k : ℕ}
-    (hε : 0 < ε) (hk : 0 < k) (hnk : 2 * k + 1 ≤ n) :
-    Container.IsLocallyDense (graph n k)
-      (densityParameter ε n k) (containerThreshold ε n k) := by
+    (hε : 0 < ε)
+    (hk : 0 < k)
+    (hnk : 2 * k + 1 ≤ n) :
+    Container.IsLocallyDense
+      (graph n k)
+      (densityParameter ε n k)
+      (containerThreshold ε n k) := by
   intro S hS
-  apply kneser_supersaturation hε hk hnk S
-  exact Nat.ceil_le.mp hS
+  have hthreshold :
+      (1 + ε) * (starSize n k : ℝ) ≤ (S.card : ℝ) := by
+    apply Nat.ceil_le.mp
+    simpa [containerThreshold] using hS
+  exact kneser_supersaturation hε hk hnk S hthreshold
 
 /-- The rounded parameters satisfy all hypotheses of the graph-container theorem.
 

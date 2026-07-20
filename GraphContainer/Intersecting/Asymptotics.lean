@@ -5,7 +5,7 @@ Authors: Graph Container formalization team
 -/
 module
 
-public import GraphContainer.IntersectingCounting.Container
+public import GraphContainer.Intersecting.Container
 public import Mathlib.Analysis.SpecialFunctions.Log.Base
 import Mathlib.Analysis.SpecialFunctions.Stirling
 import Mathlib.Data.Nat.Choose.Bounds
