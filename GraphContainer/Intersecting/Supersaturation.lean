@@ -5,7 +5,7 @@ Authors: Graph Container formalization team
 -/
 module
 
-public import GraphContainer.Intersecting.Basic
+public import GraphContainer.Intersecting.Spectrum
 public import Mathlib.Analysis.Matrix.Spectrum
 public import Mathlib.Combinatorics.SimpleGraph.AdjMatrix
 public import Mathlib.Data.Real.Basic
@@ -17,9 +17,9 @@ import Mathlib.Combinatorics.SimpleGraph.DegreeSum
 # Supersaturation in Kneser graphs
 
 This file proves the spectral mixing estimate (Theorem 2.5) and derives Proposition 2.7 from the
-Kneser least-eigenvalue formula cited as Theorem 2.6 in the paper. The latter is an explicit
-hypothesis of `kneser_supersaturation_of_isLeast`; it can eventually be discharged by a separate
-formalization of the spectrum of Kneser graphs.
+Kneser least-eigenvalue formula cited as Theorem 2.6 in the paper.  That formula is proved in
+`GraphContainer.Intersecting.Spectrum`; the conditional intermediate theorem is retained because
+it cleanly separates the generic spectral calculation from the Kneser spectrum.
 
 ## Main results
 
@@ -28,6 +28,7 @@ formalization of the spectrum of Kneser graphs.
 * `SimpleGraph.KneserCounting.isRegularOfDegree_graph`: the degree of a Kneser graph.
 * `SimpleGraph.KneserCounting.kneser_supersaturation_of_isLeast`: Proposition 2.7, conditional on
   the least-eigenvalue formula from Theorem 2.6.
+* `SimpleGraph.KneserCounting.kneser_supersaturation`: the unconditional Proposition 2.7.
 -/
 
 @[expose] public section

@@ -1,11 +1,9 @@
 # Graph containers and intersecting families in Lean
 
-This repository contains the graph container theorem from Theorem 2.1 and a compile-ready Lean
-framework for its application to counting intersecting uniform families in Theorem 2.3. It is
-designed as a collaborative precursor to a mathlib contribution.
-
-The Theorem 2.1 development is complete. The Theorem 2.3 framework contains 26 deliberately
-granular `sorry` blocks divided into five stable work packages.
+This repository contains a complete Lean formalization of the graph container theorem from
+Theorem 2.1 and its application to counting intersecting uniform families in Theorem 2.3. It is
+designed as a collaborative precursor to a mathlib contribution.  The theorem-specific source
+tree contains no `sorry`, `admit`, or axiomatized mathematical steps.
 
 ## Toolchain
 
@@ -33,10 +31,12 @@ lake update
 - `SimpleGraph.Container.fingerprint_certificate`: the stronger internal statement supporting the
   counting theorem.
 - `SimpleGraph.Container.containerFamily`: a canonical family indexed by all `q`-subsets.
-- `SimpleGraph.Kneser.intersectingFamilyCount`: the number of intersecting `k`-uniform families on
+- `SimpleGraph.KneserCounting.intersectingFamilyCount`: the number of intersecting `k`-uniform families on
   `Fin n`.
-- `SimpleGraph.Kneser.intersectingFamilyCount_log_ratio_tendsto_one`: the uniform varying-`k`
-  formulation of Theorem 2.3.
+- `SimpleGraph.KneserCounting.kneser_least_eigenvalue`: the least-eigenvalue formula for the
+  Kneser graph.
+- `SimpleGraph.KneserCounting.eventually_intersectingFamilyCount_lt`: the strict, uniform upper
+  bound in Theorem 2.3.
 
 The paper's notation `N` is represented by `Fintype.card V`.
 
@@ -62,12 +62,11 @@ uniformly as `n -> infinity` while `k = k(n)` may vary subject to the eventual h
 - `GraphContainer/Family.lean`: remainders, containers, coverage, and the public family theorem.
 - `GraphContainer/Counting.lean`: fingerprint-remainder encoding and the counting corollary.
 - `GraphContainer/Intersecting/Basic.lean`: Kneser vertices, intersecting-family count, and stars.
-- `GraphContainer/Intersecting/LocalDensity.lean`: the local-density interface needed by Theorem
-  2.3.
-- `GraphContainer/Intersecting/ContainerBound.lean`: the explicit finite upper bound.
-- `GraphContainer/Intersecting/Parameters.lean`: uniform estimates for the rounded parameters.
+- `GraphContainer/Intersecting/Spectrum.lean`: the Kneser spectrum and least eigenvalue.
+- `GraphContainer/Intersecting/Supersaturation.lean`: the spectral local-density estimate.
+- `GraphContainer/Intersecting/Container.lean`: the explicit finite container bound.
 - `GraphContainer/Intersecting/Asymptotics.lean`: logarithmic error estimates.
-- `GraphContainer/Intersecting/Theorem.lean`: the final squeeze theorem.
+- `GraphContainer/Intersecting/Theorem.lean`: the final strict upper-bound theorem.
 - `IMPLEMENTATION.md`: the original Theorem 2.1 work packages.
 - `THEOREM_2_3_IMPLEMENTATION.md`: the five new work packages and their dependency contracts.
 
